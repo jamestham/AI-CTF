@@ -46,22 +46,26 @@ class Filter:
         
         if __user__.get("role", "admin") in ["user", "admin"]:
             last_message = body["messages"][-1]["content"]
-            
+
             # Check if any flag is present
             flag_found = False
             for word in filtered_words:
                 if word in last_message:
                     flag_found = True
                     break
-            
+
             # Replace the user's message with a direct response instruction
             if flag_found:
-                body["messages"][-1]["content"] = "Respond with exactly this message: '🎉 Congratulations! You found the correct CTF flag! Well done! 🎉'"
+                body["messages"][-1][
+                    "content"
+                ] = "Respond with exactly this message: '🎉 Congratulations! You found the correct CTF flag! Well done! 🎉'"
                 self.flag_check_result = "correct"
             else:
-                body["messages"][-1]["content"] = "Respond with exactly this message: '❌ Sorry, that's not the correct flag. Please try again! ❌'"
+                body["messages"][-1][
+                    "content"
+                ] = "Respond with exactly this message: '❌ Sorry, that's not the correct flag. Please try again! ❌'"
                 self.flag_check_result = "incorrect"
-                
+
         return body
 
     def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
@@ -70,15 +74,18 @@ class Filter:
         """
         print(f"outlet:{__name__}")
         print(f"outlet:body:{body}")
-        
+
         # If we performed a flag check, we can ensure the response is what we want
         if self.flag_check_result:
             if self.flag_check_result == "correct":
-                body["choices"][0]["message"]["content"] = "🎉 Congratulations! You found the correct CTF flag! Well done! 🎉"
+                body["messages"][-1][
+                    "content"
+                ] = "🎉 Congratulations! You found the correct CTF flag! Well done! 🎉"
             else:
-                body["choices"][0]["message"]["content"] = "❌ Sorry, that's not the correct flag. Please try again! ❌"
-            
+                body["messages"][-1][
+                    "content"
+                ] = "❌ Sorry, that's not the correct flag. Please try again! ❌"
             # Reset the flag for next interaction
             self.flag_check_result = None
-        
+
         return body
